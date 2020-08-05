@@ -4,9 +4,9 @@ import numpy as np
 import skimage.io
 import matplotlib.pyplot as plt
 
-WEIGHTS_PATH="../yolov3.weights"
-CONFIG_PATH="../yolov3.cfg"
-TXT_PATH="../yolov3.txt"
+WEIGHTS_PATH="YOLO/yolov3.weights"
+CONFIG_PATH="YOLO/yolov3.cfg"
+TXT_PATH="YOLO/yolov3.txt"
 
 def get_output_layers(net):
     #Get the names of the output layers into the architecture

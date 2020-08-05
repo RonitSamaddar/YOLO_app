@@ -2,8 +2,7 @@ import os
 import time
 import cv2
 import sys
-
-# Program to Show how to create a switch  
+ 
 # import kivy module     
 import kivy   
        
