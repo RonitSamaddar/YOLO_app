@@ -19,6 +19,7 @@ from kivy.lang import Builder
 # dedicated to managing multiple screens for your application. 
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.utils import platform
+from kivy.clock import Clock
 
 from YOLO_object_detection import YOLO_object_detect
 
@@ -242,14 +243,23 @@ Builder.load_string("""
     BoxLayout:
         orientation: 'vertical'
         Label:
-            text: "HELLO! WELCOME TO THE YOLO APP"
-            size_hint : 1, 0.80
+            text: ""
+            size_hint : 1, 0.70
             background_color : 1, 0, 0, 1
             text_color : 1, 1, 1, 1
         Button: 
-            text: "HOME"
+            text: "START CAPTURING"
             size_hint: 1, 0.10 
             background_color : 1, 0, 0, 1
+            text_color : 1, 1, 1, 1 
+            on_press: 
+                # You can define the duration of the change 
+                # and the direction of the slide
+                root.capture()
+        Button: 
+            text: "HOME"
+            size_hint: 1, 0.10 
+            background_color : 0, 1, 0, 1
             text_color : 1, 1, 1, 1 
             on_press: 
                 # You can define the duration of the change 
@@ -277,19 +287,9 @@ class ScreenOne(Screen):
 class ScreenTwo(Screen):
 
     #staticmethod
-    #def on_enter(self):
-        #self._request_android_permissions()
-    #def is_android(self):
-    #    return platform == 'android'
-
-    """def _request_android_permissions(self):
-        
-        #Requests CAMERA permission on Android.
-
-        if not self.is_android():
-            return
-        from android.permissions import request_permission, Permission
-        request_permission(Permission.CAMERA)"""
+    def on_enter(self):
+        camera = self.ids['camera']
+        camera.play=False
     def capture(self):
         '''
         Function to capture the images and give them the names
@@ -372,6 +372,24 @@ class ScreenEight(Screen):
         self.manager.current = 'screen_one'
     def app_exit(self):
         exit(0)
+    def capture(self):
+        cv2.namedWindow("Image")
+        self.capture = cv2.VideoCapture(0)
+        if self.capture.isOpened(): # try to get the first frame
+            rvet, frame = vc.read()
+        else:
+            print("NOT OPENED")
+        #Clock.schedule_interval(self.update, 1.0/33.0)
+    def update(self,dt):
+        # display image from cam in opencv window
+        if self.capture.isOpened(): # try to get the first frame
+            rvet, frame = vc.read()
+        else:
+            print("NOT OPENED")
+        #print(self.capture)
+        #ret, frame = self.capture.read()
+        #print(frame.shape)
+        #cv2.imshow("Image", frame)
     pass
 
    
