@@ -47,7 +47,8 @@ class ScreenOne(Screen):
 		if self.capture.isOpened()==True:
 			ret,frame=self.capture.read();
 			cv2.imwrite("capture.png",frame)
-			self.img_id.source="capture.png"
+			YOLO_object_detect("capture.png","capture_YOLO.png")
+			self.img_id.source="capture_YOLO.png"
 			self.img_id.reload()
 	pass
 
