@@ -24,16 +24,29 @@ from YOLO_object_detection import YOLO_object_detect
 
 Builder.load_string(""" 
 <ScreenOne>:
-    BoxLayout:
-        orientation: 'vertical'
-        Label:
-            text: "HELLO! WELCOME TO THE YOLO_VIDEO"
-            size_hint : 1, 1
-            text_color : 1, 1, 1, 1
+	img_id : img
+	BoxLayout:
+		orientation: 'vertical'
+		Label:
+			text: "HELLO! WELCOME TO THE YOLO_VIDEO"
+			size_hint : 1, 0.24
+			text_color : 1, 1, 1, 1
+		Image:
+            id : img
+            source : "Black.png"
+            size_hint: 1, 0.75
+
 """)
 
 class ScreenOne(Screen):
-    pass
+	def on_enter(self):
+		self.capture=cv2.VideoCapture(0)
+		if self.capture.isOpened()==True:
+			ret,frame=self.capture.read();
+			cv2.imwrite("capture.png",frame)
+			self.img_id.source="capture.png"
+			self.img_id.reload()
+	pass
 
 # The ScreenManager controls moving between screens 
 screen_manager = ScreenManager() 
