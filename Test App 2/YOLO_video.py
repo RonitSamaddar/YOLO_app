@@ -19,6 +19,7 @@ from kivy.lang import Builder
 # dedicated to managing multiple screens for your application. 
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.utils import platform
+from kivy.clock import Clock
 
 from YOLO_object_detection import YOLO_object_detect
 
@@ -41,6 +42,8 @@ Builder.load_string("""
 class ScreenOne(Screen):
 	def on_enter(self):
 		self.capture=cv2.VideoCapture(0)
+		Clock.schedule_interval(self.update, 1.0/33.0)
+	def update(self,dt):
 		if self.capture.isOpened()==True:
 			ret,frame=self.capture.read();
 			cv2.imwrite("capture.png",frame)
