@@ -20,6 +20,9 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.utils import platform
 from kivy.clock import Clock
 
+from converter import Converter
+conv = Converter()
+
 from YOLO_object_detection import YOLO_object_detect
 
 
@@ -234,6 +237,7 @@ Builder.load_string("""
                 root.app_exit()
 <ScreenEight>:
     img_id : img
+    button_id: but
     BoxLayout:
         orientation: 'vertical'
         Image:
@@ -241,15 +245,15 @@ Builder.load_string("""
             source : "Black.png"
             size_hint: 1, 0.80
         Button: 
-            text: "CAPTURE"
+            text: "START"
+            id : but
             size_hint: 1, 0.20 
             background_color : 1, 0, 0, 1
             text_color : 1, 1, 1, 1 
             on_press: 
                 # You can define the duration of the change 
                 # and the direction of the slide
-                root.capture()
-
+                root.toggle_capture()
 """) 
    
 # Create a class for all screens in which you can include 
@@ -341,24 +345,35 @@ class ScreenSeven(Screen):
         exit(0)
     pass
 class ScreenEight(Screen):
-
-    #staticmethod
-
     def on_enter(self):
         self.cap=cv2.VideoCapture(0)
         self.event=Clock.schedule_interval(self.update, 1.0/33.0)
+        self.start_flag=0
+        self.stop_flag=0
+        self.vid=cv2.VideoWriter("VIDEO1.mp4",0,fourcc=cv2.VideoWriter_fourcc(*'MP4V'),fps=33,frameSize=(480,640))
     def update(self,dt):
         if self.cap.isOpened()==True:
             ret,frame=self.cap.read();
-            cv2.imwrite("IMG1.png",frame)
-            self.img_id.source="IMG1.png"
+            print(frame.shape)
+            cv2.imwrite("IMG3.png",frame)
+            self.img_id.source="IMG3.png"
             self.img_id.reload()
-    def capture(self):
-        Clock.unschedule(self.event)
-        self.cap.release()        
-        self.manager.transition.direction = 'left' 
-        self.manager.transition.duration = 1
-        self.manager.current = 'screen_three'
+            if(self.start_flag==1):
+                self.vid.write(frame)
+    def toggle_capture(self):
+        if(self.start_flag==0):
+            #Video will start capturing
+            self.start_flag=1
+            self.button_id.text="STOP"
+        elif(self.start_flag==1):
+            #Video will stop capturing
+            self.stop_flag=1 
+            Clock.unschedule(self.event)
+            self.cap.release()  
+            self.vid.release()   
+            self.manager.transition.direction = 'left' 
+            self.manager.transition.duration = 1
+            self.manager.current = 'screen_three'
 
 
    
