@@ -232,6 +232,23 @@ Builder.load_string("""
                 # You can define the duration of the change 
                 # and the direction of the slide
                 root.app_exit()
+<ScreenEight>:
+    img_id : img
+    BoxLayout:
+        orientation: 'vertical'
+        Image:
+            id : img
+            source : "Black.png"
+            size_hint: 1, 0.80
+        Button: 
+            text: "CAPTURE"
+            size_hint: 1, 0.20 
+            background_color : 1, 0, 0, 1
+            text_color : 1, 1, 1, 1 
+            on_press: 
+                # You can define the duration of the change 
+                # and the direction of the slide
+                root.capture()
 
 """) 
    
@@ -323,6 +340,25 @@ class ScreenSeven(Screen):
         os.system("rm -rf __pycache__")
         exit(0)
     pass
+class ScreenEight(Screen):
+
+    #staticmethod
+
+    def on_enter(self):
+        self.cap=cv2.VideoCapture(0)
+        self.event=Clock.schedule_interval(self.update, 1.0/33.0)
+    def update(self,dt):
+        if self.cap.isOpened()==True:
+            ret,frame=self.cap.read();
+            cv2.imwrite("IMG1.png",frame)
+            self.img_id.source="IMG1.png"
+            self.img_id.reload()
+    def capture(self):
+        Clock.unschedule(self.event)
+        self.cap.release()        
+        self.manager.transition.direction = 'left' 
+        self.manager.transition.duration = 1
+        self.manager.current = 'screen_three'
 
 
    
@@ -338,7 +374,8 @@ screen_manager.add_widget(ScreenThree(name ="screen_three"))
 screen_manager.add_widget(ScreenFour(name ="screen_four"))
 screen_manager.add_widget(ScreenFive(name ="screen_five"))
 screen_manager.add_widget(ScreenSix(name ="screen_six"))
-screen_manager.add_widget(ScreenSeven(name ="screen_seven"))    
+screen_manager.add_widget(ScreenSeven(name ="screen_seven"))
+screen_manager.add_widget(ScreenEight(name ="screen_eight"))    
   
 # Create the App class 
 class ScreenApp(App): 
