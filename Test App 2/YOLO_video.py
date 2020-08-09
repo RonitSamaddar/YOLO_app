@@ -30,12 +30,13 @@ Builder.load_string("""
 		orientation: 'vertical'
 		Label:
 			text: "HELLO! WELCOME TO THE YOLO_VIDEO"
-			size_hint : 1, 0.24
+			size_hint : 1, 0.25
 			text_color : 1, 1, 1, 1
 		Image:
             id : img
             source : "Black.png"
             size_hint: 1, 0.75
+
 
 """)
 
