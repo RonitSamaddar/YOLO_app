@@ -149,6 +149,90 @@ Builder.load_string("""
                 # You can define the duration of the change 
                 # and the direction of the slide
                 root.app_exit()
+<ScreenFive>:
+    text_input: text_input
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserIconView:
+            id: filechooser
+            on_selection: text_input.text = self.selection and self.selection[0] or ''
+
+        TextInput:
+            id: text_input
+            size_hint_y: None
+            height: 30
+            multiline: False
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Save"
+                on_release:
+                    root.save(filechooser.path, text_input.text)
+<ScreenSix>:
+    image_id : img
+    BoxLayout:
+        orientation: 'vertical'
+        Image:
+            id : img
+            source : "IMG2.png"
+            size_hint: 1, 0.68
+        Button: 
+            text: "CHOOSE A DIFFERENT PICTURE"
+            size_hint: 1, 0.16 
+            background_color : 0, 1, 1, 1
+            text_color : 1, 1, 1, 1 
+            on_press: 
+                # You can define the duration of the change 
+                # and the direction of the slide
+                root.manager.transition.direction = 'left' 
+                root.manager.transition.duration = 1 
+                root.manager.current = 'screen_five'
+        Button: 
+            text: "PERFORM YOLO"
+            size_hint: 1, 0.16 
+            background_color : 1, 0, 0, 1
+            text_color : 1, 1, 1, 1 
+            on_press: 
+                # You can define the duration of the change 
+                # and the direction of the slide
+                root.manager.transition.direction = 'left' 
+                root.manager.transition.duration = 1 
+                root.manager.current = 'screen_seven'
+<ScreenSeven>:
+    image_id : img
+    BoxLayout:
+        orientation: 'vertical'
+        Image:
+            id : img
+            source : "IMG_YOLO2.png"
+            size_hint: 1, 0.72
+        Button: 
+            text: "HOME"
+            size_hint: 1, 0.14 
+            background_color : 1, 0, 0, 1
+            text_color : 1, 1, 1, 1 
+            on_press: 
+                # You can define the duration of the change 
+                # and the direction of the slide
+                root.app_home()
+        Button: 
+            text: "EXIT"
+            size_hint: 1, 0.14 
+            background_color : 1, 1, 0, 1
+            text_color : 1, 1, 1, 1 
+            on_press: 
+                # You can define the duration of the change 
+                # and the direction of the slide
+                root.app_exit()
+
 """) 
    
 # Create a class for all screens in which you can include 
@@ -181,7 +265,6 @@ class ScreenThree(Screen):
     def on_enter(self):
             image=self.ids['img']
             image.reload()
-    
     pass
 class ScreenFour(Screen):
     def perform_YOLO(self):
@@ -203,6 +286,44 @@ class ScreenFour(Screen):
         os.system("rm -rf __pycache__")
         exit(0)
     pass
+class ScreenFive(Screen):
+    def save(self,path,text):
+        os.system("cp "+str(text)+" IMG2.png")
+        time.sleep(1)
+        self.manager.transition.direction = 'left' 
+        self.manager.transition.duration = 1
+        self.manager.current = 'screen_six'
+    def cancel(self):
+        self.manager.transition.direction = 'left' 
+        self.manager.transition.duration = 1
+        self.manager.current = 'screen_one'
+    pass
+class ScreenSix(Screen):
+    def on_enter(self):
+            image=self.ids['img']
+            image.reload()
+    pass
+class ScreenSeven(Screen):
+    def perform_YOLO(self):
+            YOLO_object_detect("IMG2.png","IMG_YOLO2.png")
+    def on_enter(self):
+            self.perform_YOLO()
+            image=self.ids['img']
+            image.reload()
+    def app_home(self):
+        os.remove("IMG2.png")
+        os.remove("IMG_YOLO2.png")
+        os.system("rm -rf __pycache__")
+        self.manager.transition.direction = 'left' 
+        self.manager.transition.duration = 1 
+        self.manager.current = 'screen_one'
+    def app_exit(self):
+        os.remove("IMG2.png")
+        os.remove("IMG_YOLO2.png")
+        os.system("rm -rf __pycache__")
+        exit(0)
+    pass
+
 
    
    
@@ -214,7 +335,10 @@ screen_manager = ScreenManager()
 screen_manager.add_widget(ScreenOne(name ="screen_one")) 
 screen_manager.add_widget(ScreenTwo(name ="screen_two"))
 screen_manager.add_widget(ScreenThree(name ="screen_three")) 
-screen_manager.add_widget(ScreenFour(name ="screen_four"))    
+screen_manager.add_widget(ScreenFour(name ="screen_four"))
+screen_manager.add_widget(ScreenFive(name ="screen_five"))
+screen_manager.add_widget(ScreenSix(name ="screen_six"))
+screen_manager.add_widget(ScreenSeven(name ="screen_seven"))    
   
 # Create the App class 
 class ScreenApp(App): 
