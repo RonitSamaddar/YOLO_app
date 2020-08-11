@@ -386,13 +386,13 @@ class ScreenEight(Screen):
     def on_enter(self):
         self.cap=cv2.VideoCapture(0)
         self.event=Clock.schedule_interval(self.update, 1.0/33.0)
+        self.button_id.text="START"
         self.start_flag=0
         self.stop_flag=0
         self.vid=cv2.VideoWriter("VIDEO1.mp4",0,fourcc=cv2.VideoWriter_fourcc(*'MP4V'),fps=33,frameSize=(480,640))
     def update(self,dt):
         if self.cap.isOpened()==True:
             ret,frame=self.cap.read();
-            print(frame.shape)
             cv2.imwrite("IMG3.png",frame)
             self.img_id.source="IMG3.png"
             self.img_id.reload()
