@@ -254,6 +254,44 @@ Builder.load_string("""
                 # You can define the duration of the change 
                 # and the direction of the slide
                 root.toggle_capture()
+<ScreenNine>:
+    image_id : img
+    BoxLayout:
+        orientation: 'vertical'
+        Image:
+            id : img
+            source : "Black.png"
+            size_hint: 1, 0.70
+        Button:
+            text: "PLAY"
+            size_hint: 1,0.10
+            background_color: 1,0,1,1
+            text_color: 1,1,1,1
+            on_press:
+                root.play_video()
+        Button: 
+            text: "RETAKE VIDEO"
+            size_hint: 1, 0.16 
+            background_color : 0, 1, 1, 1
+            text_color : 1, 1, 1, 1 
+            on_press: 
+                # You can define the duration of the change 
+                # and the direction of the slide
+                root.reset_video()
+                root.manager.transition.direction = 'left' 
+                root.manager.transition.duration = 1 
+                root.manager.current = 'screen_eight'
+        Button: 
+            text: "PERFORM YOLO"
+            size_hint: 1, 0.16 
+            background_color : 1, 0, 0, 1
+            text_color : 1, 1, 1, 1 
+            on_press: 
+                # You can define the duration of the change 
+                # and the direction of the slide
+                root.manager.transition.direction = 'left' 
+                root.manager.transition.duration = 1 
+                root.manager.current = 'screen_four'
 """) 
    
 # Create a class for all screens in which you can include 
@@ -373,7 +411,14 @@ class ScreenEight(Screen):
             self.vid.release()   
             self.manager.transition.direction = 'left' 
             self.manager.transition.duration = 1
-            self.manager.current = 'screen_three'
+            self.manager.current = 'screen_nine'
+class ScreenNine(Screen):
+    def play_video(self):
+        pass
+    def reset_video(self):
+        os.remove("VIDEO1.mp4")
+            
+    pass
 
 
    
@@ -391,7 +436,7 @@ screen_manager.add_widget(ScreenFive(name ="screen_five"))
 screen_manager.add_widget(ScreenSix(name ="screen_six"))
 screen_manager.add_widget(ScreenSeven(name ="screen_seven"))
 screen_manager.add_widget(ScreenEight(name ="screen_eight"))    
-  
+screen_manager.add_widget(ScreenNine(name ="screen_nine"))  
 # Create the App class 
 class ScreenApp(App): 
     def build(self):
