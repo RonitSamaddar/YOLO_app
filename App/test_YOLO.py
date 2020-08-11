@@ -413,7 +413,15 @@ class ScreenEight(Screen):
             self.manager.transition.duration = 1
             self.manager.current = 'screen_nine'
 class ScreenNine(Screen):
+    def on_enter(self):
+        video="VIDEO1.mp4"
+        self.capture=cv2.VideoCapture(video)
     def play_video(self):
+        ret,frame=self.capture.read()
+        cv2.imshow("FRAME",frame)
+        cv2.imwrite("IMG3.png",frame)
+        self.img_id.source="IMG3.png"
+        self.img_id.reload()        
         pass
     def reset_video(self):
         os.remove("VIDEO1.mp4")
