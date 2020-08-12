@@ -85,7 +85,7 @@ Builder.load_string("""
         orientation: 'vertical'
         Image:
             id : img
-            source : "Black.png"
+            source : ""
             size_hint: 1, 0.80
         Button: 
             text: "CAPTURE"
@@ -242,7 +242,7 @@ Builder.load_string("""
         orientation: 'vertical'
         Image:
             id : img
-            source : "Black.png"
+            source : ""
             size_hint: 1, 0.80
         Button: 
             text: "START"
@@ -256,13 +256,15 @@ Builder.load_string("""
                 root.toggle_capture()
 <ScreenNine>:
     image_id : img
+    button_id : but
     BoxLayout:
         orientation: 'vertical'
         Image:
             id : img
-            source : "Black.png"
+            source : ""
             size_hint: 1, 0.70
         Button:
+            id : but
             text: "PLAY"
             size_hint: 1,0.10
             background_color: 1,0,1,1
@@ -389,7 +391,7 @@ class ScreenEight(Screen):
         self.button_id.text="START"
         self.start_flag=0
         self.stop_flag=0
-        self.vid=cv2.VideoWriter("VIDEO1.mp4",0,fourcc=cv2.VideoWriter_fourcc(*'MP4V'),fps=33,frameSize=(480,640))
+        self.vid=cv2.VideoWriter("VIDEO1.avi",0,fourcc=cv2.VideoWriter_fourcc(*'XVID'),fps=33,frameSize=(480,640))
     def update(self,dt):
         if self.cap.isOpened()==True:
             ret,frame=self.cap.read();
@@ -414,17 +416,43 @@ class ScreenEight(Screen):
             self.manager.current = 'screen_nine'
 class ScreenNine(Screen):
     def on_enter(self):
-        video="VIDEO1.mp4"
-        self.capture=cv2.VideoCapture(video)
+        self.video="cockatoo.mp4"
+        self.capture=cv2.VideoCapture(self.video)
+        self.start_flag=0
+        self.stop_flag=0
+        self.button_id.text="PLAY"
     def play_video(self):
+        if(self.start_flag==0 and self.stop_flag==0):
+            self.start_flag=1
+            self.button_id.text="STOP"
+            self.event=Clock.schedule_interval(self.update, 1.0/33.0)
+        elif(self.start_flag==1 and self.stop_flag==0):
+            self.stop_flag=1
+            self.start_flag=0
+            self.stop_video()
+            self.button_id.text="PLAY"
+        elif(self.start_flag==0 and self.stop_flag==1):
+            self.start_flag=1
+            self.stop_flag=0
+            self.button_id.text="STOP"
+            self.capture=cv2.VideoCapture(self.video)
+            self.event=Clock.schedule_interval(self.update, 1.0/33.0)
+    def update(self,dt):
         ret,frame=self.capture.read()
-        cv2.imshow("FRAME",frame)
+        #cv2.imshow("FRAME",frame)
+        if(ret==False):
+            self.stop_video()
         cv2.imwrite("IMG3.png",frame)
-        self.img_id.source="IMG3.png"
-        self.img_id.reload()        
+        self.image_id.source="IMG3.png"
+        self.image_id.reload()        
         pass
+    def stop_video(self):
+        Clock.unschedule(self.event)
+        self.capture.release()
     def reset_video(self):
-        os.remove("VIDEO1.mp4")
+        #Clock.unschedule(self.event)
+        #os.remove("cockatoo")
+        pass
             
     pass
 
