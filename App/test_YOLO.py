@@ -391,7 +391,7 @@ class ScreenEight(Screen):
         self.button_id.text="START"
         self.start_flag=0
         self.stop_flag=0
-        self.vid=cv2.VideoWriter("VIDEO1.avi",0,fourcc=cv2.VideoWriter_fourcc(*'XVID'),fps=33,frameSize=(480,640))
+        self.vid=cv2.VideoWriter("VIDEO1.avi",0,fourcc=cv2.VideoWriter_fourcc(*'MJPG'),fps=33,frameSize=(640,480))
     def update(self,dt):
         if self.cap.isOpened()==True:
             ret,frame=self.cap.read();
@@ -416,7 +416,7 @@ class ScreenEight(Screen):
             self.manager.current = 'screen_nine'
 class ScreenNine(Screen):
     def on_enter(self):
-        self.video="cockatoo.mp4"
+        self.video="VIDEO1.avi"
         self.capture=cv2.VideoCapture(self.video)
         self.start_flag=0
         self.stop_flag=0
@@ -442,6 +442,7 @@ class ScreenNine(Screen):
         #cv2.imshow("FRAME",frame)
         if(ret==False):
             self.stop_video()
+            return
         cv2.imwrite("IMG3.png",frame)
         self.image_id.source="IMG3.png"
         self.image_id.reload()        
