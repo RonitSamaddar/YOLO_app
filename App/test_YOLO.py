@@ -410,15 +410,24 @@ Builder.load_string("""
                 root.manager.current = 'screen_thirteen'
 <ScreenThirteen>:
     image_id : img
+    button_id : but
     BoxLayout:
         orientation: 'vertical'
         Image:
             id : img
-            source : "IMG_YOLO2.png"
-            size_hint: 1, 0.72
+            source : ""
+            size_hint: 1, 0.70
+        Button:
+            text: "PROCESSING . . . ."
+            id : but
+            size_hint: 1, 0.10
+            background_color : 0, 1, 1, 1
+            text_color: 1,1,1,1
+            on_press:
+                root.play_video()
         Button: 
             text: "HOME"
-            size_hint: 1, 0.14 
+            size_hint: 1, 0.10 
             background_color : 1, 0, 0, 1
             text_color : 1, 1, 1, 1 
             on_press: 
@@ -427,7 +436,7 @@ Builder.load_string("""
                 root.app_home()
         Button: 
             text: "EXIT"
-            size_hint: 1, 0.14 
+            size_hint: 1, 0.10 
             background_color : 1, 1, 0, 1
             text_color : 1, 1, 1, 1 
             on_press: 
@@ -670,7 +679,7 @@ class ScreenTen(Screen):
 class ScreenEleven(Screen):
     def save(self,path,text):
         print(text[-3:])
-        os.system("cp "+str(text)+" VIDEO2.mp4")
+        os.system("cp "+str(text)+" VIDEO2.avi")
         time.sleep(1)
         self.manager.transition.direction = 'left' 
         self.manager.transition.duration = 1
@@ -682,7 +691,7 @@ class ScreenEleven(Screen):
     pass
 class ScreenTwelve(Screen):
     def on_enter(self):
-        self.video="VIDEO2.mp4"
+        self.video="VIDEO2.avi"
         self.capture=cv2.VideoCapture(self.video)
         self.start_flag=0
         self.stop_flag=0
@@ -723,23 +732,87 @@ class ScreenTwelve(Screen):
     pass
     pass
 class ScreenThirteen(Screen):
-    def perform_YOLO(self):
-            YOLO_object_detect("IMG2.png","IMG_YOLO2.png")
     def on_enter(self):
-            self.perform_YOLO()
-            image=self.ids['img']
-            image.reload()
+            self.processed_flag=0
+            self.start_flag=0
+            self.stop_flag=0
+            self.button_id.text="PROCESSING . . . ."
+            self.video_orig="VIDEO2.avi"
+            self.video_YOLO="VIDEO2_YOLO.avi"
+            self.frame_h=0
+            self.frame_w=0
+            self.frames=[]
+            
+            self.capture1=cv2.VideoCapture(self.video_orig)
+            self.capture2=cv2.VideoCapture(self.video_YOLO)
+            self.per=Clock.schedule_interval(self.perform_YOLO,1.0/33.0)
+    def perform_YOLO(self,dt):
+            ret,frame=self.capture1.read()
+            self.frame_h=frame.shape[0]
+            self.frame_w=frame.shape[1]
+            if(ret==False):
+                self.processed_flag=1
+                Clock.unschedule(self.per)
+                self.capture1.release()
+                return
+            cv2.imwrite("IMG3.png",frame)
+            YOLO_object_detect("IMG3.png","IMG_YOLO3.png")
+            frame2=cv2.imread("IMG_YOLO3.png")
+            self.frames.append(frame2)
+            #self.vid.write(frame2)
+    def play_video(self):
+        if(self.processed_flag==0):return
+        if(self.processed_flag==1):
+        	self.vid=cv2.VideoWriter(self.video_YOLO,0,fourcc=cv2.VideoWriter_fourcc(*'MJPG'),fps=33,frameSize=(self.frame_h,self.frame_w))
+        	for f in self.frames:
+        		self.vid.write(f)
+        	self.button_id.text="PLAY"
+        	return
+
+        if(self.start_flag==0 and self.stop_flag==0):
+            self.start_flag=1
+            self.button_id.text="STOP"
+            self.event=Clock.schedule_interval(self.update, 1.0/33.0)
+        elif(self.start_flag==1 and self.stop_flag==0):
+            self.stop_flag=1
+            self.start_flag=0
+            self.stop_video()
+            self.button_id.text="PLAY"
+        elif(self.start_flag==0 and self.stop_flag==1):
+            self.start_flag=1
+            self.stop_flag=0
+            self.button_id.text="STOP"
+            self.capture2=cv2.VideoCapture(self.video_YOLO)
+            self.event=Clock.schedule_interval(self.update, 1.0/33.0)
+    def update(self,dt):
+        ret,frame=self.capture2.read()
+        #cv2.imshow("FRAME",frame)
+        if(ret==False):
+            self.stop_video()
+            return
+        cv2.imwrite("IMG3.png",frame)
+        self.image_id.source="IMG3.png"
+        self.image_id.reload()        
+        pass
+    def stop_video(self):
+        Clock.unschedule(self.event)
+        self.capture2.release()
+
+
+
     def app_home(self):
-        os.remove("IMG2.png")
-        os.remove("IMG_YOLO2.png")
-        os.system("rm -rf __pycache__")
+        os.remove("IMG3.png")
+        os.remove("IMG_YOLO3.png")
+        os.remove("VIDEO2.mp4")
+        os.remove("VIDEO2_YOLO.mp4")
         self.manager.transition.direction = 'left' 
         self.manager.transition.duration = 1 
         self.manager.current = 'screen_one'
     def app_exit(self):
-        os.remove("IMG2.png")
-        os.remove("IMG_YOLO2.png")
-        os.system("rm -rf __pycache__")
+        os.remove("IMG3.png")
+        os.remove("IMG_YOLO3.png")
+        os.remove("VIDEO2.mp4")
+        os.remove("VIDEO2_YOLO.mp4")
         exit(0)
     pass
 
