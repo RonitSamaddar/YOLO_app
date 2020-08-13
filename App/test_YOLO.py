@@ -34,7 +34,7 @@ Builder.load_string("""
         orientation: 'vertical'
         Label:
             text: "HELLO! WELCOME TO THE YOLO APP"
-            size_hint : 1, 0.60
+            size_hint : 1, 0.50
             background_color : 1, 0, 0, 1
             text_color : 1, 1, 1, 1
         Button: 
@@ -70,6 +70,17 @@ Builder.load_string("""
                 root.manager.transition.direction = 'left' 
                 root.manager.transition.duration = 1 
                 root.manager.current = 'screen_five'
+        Button: 
+            text: "OPEN VIDEO UPLOADER"
+            size_hint: 1, 0.10 
+            background_color : 1, 0, 1, 1
+            text_color : 1, 1, 1, 1 
+            on_press: 
+                # You can define the duration of the change 
+                # and the direction of the slide
+                root.manager.transition.direction = 'left' 
+                root.manager.transition.duration = 1 
+                root.manager.current = 'screen_eleven'
         Button: 
             text: "EXIT"
             size_hint: 1, 0.10 
@@ -329,6 +340,89 @@ Builder.load_string("""
                 # You can define the duration of the change 
                 # and the direction of the slide
                 root.app_exit()
+<ScreenEleven>:
+    text_input: text_input
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserIconView:
+            id: filechooser
+            on_selection: text_input.text = self.selection and self.selection[0] or ''
+
+        TextInput:
+            id: text_input
+            size_hint_y: None
+            height: 30
+            multiline: False
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Save"
+                on_release:
+                    root.save(filechooser.path, text_input.text)
+<ScreenTwelve>:
+    image_id : img
+    BoxLayout:
+        orientation: 'vertical'
+        Image:
+            id : img
+            source : "IMG2.png"
+            size_hint: 1, 0.68
+        Button: 
+            text: "CHOOSE A DIFFERENT PICTURE"
+            size_hint: 1, 0.16 
+            background_color : 0, 1, 1, 1
+            text_color : 1, 1, 1, 1 
+            on_press: 
+                # You can define the duration of the change 
+                # and the direction of the slide
+                root.manager.transition.direction = 'left' 
+                root.manager.transition.duration = 1 
+                root.manager.current = 'screen_five'
+        Button: 
+            text: "PERFORM YOLO"
+            size_hint: 1, 0.16 
+            background_color : 1, 0, 0, 1
+            text_color : 1, 1, 1, 1 
+            on_press: 
+                # You can define the duration of the change 
+                # and the direction of the slide
+                root.manager.transition.direction = 'left' 
+                root.manager.transition.duration = 1 
+                root.manager.current = 'screen_seven'
+<ScreenThirteen>:
+    image_id : img
+    BoxLayout:
+        orientation: 'vertical'
+        Image:
+            id : img
+            source : "IMG_YOLO2.png"
+            size_hint: 1, 0.72
+        Button: 
+            text: "HOME"
+            size_hint: 1, 0.14 
+            background_color : 1, 0, 0, 1
+            text_color : 1, 1, 1, 1 
+            on_press: 
+                # You can define the duration of the change 
+                # and the direction of the slide
+                root.app_home()
+        Button: 
+            text: "EXIT"
+            size_hint: 1, 0.14 
+            background_color : 1, 1, 0, 1
+            text_color : 1, 1, 1, 1 
+            on_press: 
+                # You can define the duration of the change 
+                # and the direction of the slide
+                root.app_exit()
 """) 
    
 # Create a class for all screens in which you can include 
@@ -562,6 +656,43 @@ class ScreenTen(Screen):
         os.remove("VIDEO1_YOLO.avi")
         exit(0)
     pass
+class ScreenEleven(Screen):
+    def save(self,path,text):
+        os.system("cp "+str(text)+" IMG2.png")
+        time.sleep(1)
+        self.manager.transition.direction = 'left' 
+        self.manager.transition.duration = 1
+        self.manager.current = 'screen_six'
+    def cancel(self):
+        self.manager.transition.direction = 'left' 
+        self.manager.transition.duration = 1
+        self.manager.current = 'screen_one'
+    pass
+class ScreenTwelve(Screen):
+    def on_enter(self):
+            image=self.ids['img']
+            image.reload()
+    pass
+class ScreenThirteen(Screen):
+    def perform_YOLO(self):
+            YOLO_object_detect("IMG2.png","IMG_YOLO2.png")
+    def on_enter(self):
+            self.perform_YOLO()
+            image=self.ids['img']
+            image.reload()
+    def app_home(self):
+        os.remove("IMG2.png")
+        os.remove("IMG_YOLO2.png")
+        os.system("rm -rf __pycache__")
+        self.manager.transition.direction = 'left' 
+        self.manager.transition.duration = 1 
+        self.manager.current = 'screen_one'
+    def app_exit(self):
+        os.remove("IMG2.png")
+        os.remove("IMG_YOLO2.png")
+        os.system("rm -rf __pycache__")
+        exit(0)
+    pass
 
 
 
@@ -581,7 +712,10 @@ screen_manager.add_widget(ScreenSix(name ="screen_six"))
 screen_manager.add_widget(ScreenSeven(name ="screen_seven"))
 screen_manager.add_widget(ScreenEight(name ="screen_eight"))    
 screen_manager.add_widget(ScreenNine(name ="screen_nine"))
-screen_manager.add_widget(ScreenTen(name ="screen_ten"))  
+screen_manager.add_widget(ScreenTen(name ="screen_ten"))
+screen_manager.add_widget(ScreenEleven(name ="screen_eleven"))    
+screen_manager.add_widget(ScreenTwelve(name ="screen_twelve"))
+screen_manager.add_widget(ScreenThirteen(name ="screen_thirteen"))   
 # Create the App class 
 class ScreenApp(App): 
     def build(self):
